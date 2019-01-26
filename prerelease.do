@@ -1,7 +1,7 @@
 // Pre-Release of MosaiCH Data
 // January 2018
 
-cd H:\Dokumente_SOZ\Arbeitsmarkt\P3_Vignetten\MOSAiCH\2018\Daten_Mosaich18
+cd H:\Dokumente_SOZ\Arbeitsmarkt\P3_Vignetten\MOSAiCH\2018\Prerelease18
 use mosaich18_prerelease.dta, clear
 
 fre RS33a_w2 RS33b_w2 RS33c_w2 RS33d_w2 RS33e_w2 RS33f_w2
@@ -34,7 +34,7 @@ gen friendswith = RS36_w2
 
 mvdecode workwith promote friendswith, mv(-6 -2 -1 12)
 
-save Mosaich_preRelease2.dta, replace
+save mosaich18_prerelease2.dta, replace
 fre v*
 fre workwith promote friendswith
 fre RS34_w2 RS35_w2 RS36_w2
@@ -45,10 +45,13 @@ use mosaich18_prerelease2.dta, clear
 
 qui reg workwith i.vmale
 qui margins vmale, post
+eststo m1
 qui reg promote i.vmale
 qui margins vmale, post
+eststo m2
 qui reg friendswith i.vmale
 qui margins vmale, post
+eststo m3
 
 coefplot m1 m2 m3, xline(0) aseq
 
