@@ -43,34 +43,52 @@ fre RS34_w2 RS35_w2 RS36_w2
 
 use mosaich18_prerelease2.dta, clear
 
-qui reg workwith i.vmale
-qui margins vmale, post
+*Haupteffekte
+qui reg workwith i.v*
 eststo m1
-qui reg promote i.vmale
-qui margins vmale, post
+reg promote i.v*
 eststo m2
-qui reg friendswith i.vmale
-qui margins vmale, post
+qui reg friendswith i.v*
 eststo m3
 
-coefplot m1 m2 m3, xline(0) aseq
+grstyle init
+grstyle set plain, grid
+grstyle set legend 6, nobox
 
-reg workwith i.vmale##i.vmarried
-reg promote i.vmale##i.vmarried
-reg friendswith i.vmale##i.vmarried
+coefplot m1, bylabel(Work With) || m2, bylabel(Promote) || m3, bylabel(Friends With) || ///
+, xline(0) drop(_cons) byopts(row(1))  coeflabels(1.vmale = "Male" 1.vmarried = "Married" ///
+1.vhperform = "High Performance" 1.vhorigin = "High Social Origin" ///
+1.vhasp = "High Aspirations" 1.vreligion = "Religious")
+graph export Haupteffekte.png, replace
 
-reg workwith i.vmale##i.vhperform
-reg promote i.vmale##i.vhperform
-reg friendswith i.vmale##i.vhperform
+esttab m* using Haupteffekte.rtf, replace
 
-reg workwith i.vhorigin
-reg promote i.vhorigin
-reg friendswith i.vhorigin
+varma
+fre RS33a_w2
 
-reg workwith i.vmale##i.vhorigin
-reg promote i.vmale##i.vhorigin
-reg friendswith i.vmale##i.vhorigin
+reg workwith i.RS33a_w2
+// Interaktion mit gender
+qui reg workwith i.vh* i.vmar i.vrel if vmale==1
+eststo m1
+qui reg promote i.vh* i.vmar i.vrel if vmale==1
+eststo m2
+qui reg friendswith i.vh* i.vmar i.vrel if vmale==1
+eststo m3
 
-reg workwith i.vmale##i.vhasp
-reg promote i.vmale##i.vhasp
-reg friendswith i.vmale##i.vhasp
+qui reg workwith i.vh* i.vmar i.vrel if vmale==0
+eststo f1
+qui reg promote i.vh* i.vmar i.vrel if vmale==0
+eststo f2
+qui reg friendswith i.vh* i.vmar i.vrel if vmale==0
+eststo f3
+
+coefplot (m1, label (Men)) (f1, label (Women)), bylabel(Work With) || ///
+         (m2, label (Men)) (f2, label (Women)), bylabel(Promote) || ///
+         (m3, label (Men)) (f3, label (Women)), bylabel(Friends With) || ///
+         , xline(0) drop(_cons) byopts(row(1)) ///
+         coeflabels(1.vmarried = "Married" ///
+         1.vhperform = "High Performance" 1.vhorigin = "High Social Origin" ///
+         1.vhasp = "High Aspirations" 1.vreligion = "Religious")
+         graph export Interaktion.png, replace
+
+         esttab m* f* using Interaktion.rtf, replace
