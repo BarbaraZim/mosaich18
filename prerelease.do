@@ -102,23 +102,82 @@ lab val male vmale
 fre male
 
 // By gender of respondent
-
-reg workwith i.vmale##i.vmarried if male==1
+// Haupteffekt Gender
+qui reg workwith i.vmale if male==1
+qui margins vmale, post
 eststo m1
-reg promote i.vmale##i.vmarried if male==1
+qui reg promote i.vmale if male==1
+qui margins vmale, post
 eststo m2
-reg friendswith i.vmale##i.vmarried if male==1
+qui reg friendswith i.vmale if male==1
+qui margins vmale, post
 eststo m3
 
-reg workwith i.vmale##i.vmarried if male==0
+qui reg workwith i.vmale if male==0
+qui margins vmale, post
 eststo f1
-reg promote i.vmale##i.vmarried if male==0
+qui reg promote i.vmale if male==0
+qui margins vmale, post
 eststo f2
-reg friendswith i.vmale##i.vmarried if male==0
+qui reg friendswith i.vmale if male==0
+qui margins vmale, post
 eststo f3
 
+coefplot (m1, label (Respondent: Male)) (f1, label (Respondent: Female)), bylabel(Work With) || ///
+         (m2, label (Respondent: Male)) (f2, label (Respondent: Female)), bylabel(Promote) || ///
+         (m3, label (Respondent: Male)) (f3, label (Respondent: Female)), bylabel(Friends With) || ///
+         , xline(0) drop(_cons) byopts(row(1)) coeflabels(0.vmale = "Vignette: Female" 1.vmale = "Vignette: Male")
+      graph export RespGender.png, replace
 
+gen vmalemar = vmale if vmarried==1
+gen vmalesin = vmale if vmarried==0
 
-         graph export Respondent.png, replace
+eststo clear
+// Interaktion Gender#Married
+qui reg workwith i.vmalemar if male==1
+qui margins vmalemar, post
+eststo m1a
+qui reg promote i.vmalemar if male==1
+qui margins vmalemar, post
+eststo m2a
+qui reg friendswith i.vmalemar if male==1
+qui margins vmalemar, post
+eststo m3a
 
-         esttab m* f* using Respondent.rtf, replace
+qui reg workwith i.vmalemar if male==0
+qui margins vmalemar, post
+eststo f1a
+qui reg promote i.vmalemar if male==0
+qui margins vmalemar, post
+eststo f2a
+qui reg friendswith i.vmalemar if male==0
+qui margins vmalemar, post
+eststo f3a
+
+//Gender#NotMarried
+qui reg workwith i.vmalesin if male==1
+qui margins vmalesin, post
+eststo m1b
+qui reg promote i.vmalesin if male==1
+qui margins vmalesin, post
+eststo m2b
+qui reg friendswith i.vmalesin if male==1
+qui margins vmalesin, post
+eststo m3b
+
+qui reg workwith i.vmalesin if male==0
+qui margins vmalesin, post
+eststo f1b
+qui reg promote i.vmalesin if male==0
+qui margins vmalesin, post
+eststo f2b
+qui reg friendswith i.vmalesin if male==0
+qui margins vmalesin, post
+eststo f3b
+
+coefplot (m1*, label (Respondent: Male)) (f1*, label (Respondent: Female)), bylabel(Work With) || ///
+         (m2*, label (Respondent: Male)) (f2*, label (Respondent: Female)), bylabel(Promote) || ///
+         (m3*, label (Respondent: Male)) (f3*, label (Respondent: Female)), bylabel(Friends With) || ///
+         , drop(_cons) byopts(row(1)) coeflabels(0.vmalemar = "Vignette: Married-Female" ///
+         1.vmalemar = "Vignette: Married-Male" 0.vmalesin = "Vignette: Single-Female" ///
+         1.vmalesin = "Vignette: Single-Male")
