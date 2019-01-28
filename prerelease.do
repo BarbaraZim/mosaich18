@@ -3,6 +3,8 @@
 
 cd H:\Dokumente_SOZ\Arbeitsmarkt\P3_Vignetten\MOSAiCH\2018\Prerelease18
 use mosaich18_prerelease.dta, clear
+use mosaich18_prerelease2.dta, clear
+varma
 
 fre RS33a_w2 RS33b_w2 RS33c_w2 RS33d_w2 RS33e_w2 RS33f_w2
 gen vmale = RS33a_w2
@@ -92,3 +94,31 @@ coefplot (m1, label (Men)) (f1, label (Women)), bylabel(Work With) || ///
          graph export Interaktion.png, replace
 
          esttab m* f* using Interaktion.rtf, replace
+
+fre DEMO1
+gen male = DEMO1
+recode male (2=0) (-2=.)
+lab val male vmale
+fre male
+
+// By gender of respondent
+
+reg workwith i.vmale##i.vmarried if male==1
+eststo m1
+reg promote i.vmale##i.vmarried if male==1
+eststo m2
+reg friendswith i.vmale##i.vmarried if male==1
+eststo m3
+
+reg workwith i.vmale##i.vmarried if male==0
+eststo f1
+reg promote i.vmale##i.vmarried if male==0
+eststo f2
+reg friendswith i.vmale##i.vmarried if male==0
+eststo f3
+
+
+
+         graph export Respondent.png, replace
+
+         esttab m* f* using Respondent.rtf, replace
